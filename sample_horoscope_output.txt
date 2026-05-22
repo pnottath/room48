@@ -1,0 +1,150 @@
+══════════════════════════════════════════════════════════════════════════════
+  JANMA KUNDALI — Sample Native
+  (Kerala Parashari tradition · Lahiri ayanamsa)
+══════════════════════════════════════════════════════════════════════════════
+
+
+§1. JANMA VIVARAM
+------------------------------------------------------------------------------
+=== Janma Vivaram for Sample Native ===
+Date  : 1990-06-15  07:45:00
+Place : Thiruvananthapuram, Kerala, India  (8.5241°N, 76.9366°E)
+Timezone: Asia/Kolkata
+Julian Day (UT): 2448057.593750
+Ayanamsa (Lahiri): 23.7237°
+
+Lagna (Ascendant): Mithunam 22.27°  [Punarvasu pada 1]
+
+Planet   Rasi             Deg  House  Nakshatra         Pada  Dignity
+--------------------------------------------------------------------------------------
+Sun      Mithunam       0.01      1  Mrigashira           3  
+Moon     Kumbham       16.23      9  Shatabhisha          3  
+Mars     Meenam        17.02     10  Revati               1  
+Mercury  Vrishabham    11.27     12  Rohini               1  
+Jupiter  Mithunam      22.07      1  Punarvasu            1  
+Venus    Mesham        24.57     11  Bharani              4  
+Saturn   Makaram        0.33 R    8  Uttara Ashadha       2  Own sign (Swakshetra)
+Rahu     Makaram       15.99 R    8  Shravana             2  
+Ketu     Karkatakam    15.99 R    2  Pushya               4  
+
+
+Janma Nakshatra : Shatabhisha (pada 3)
+Janma Rasi      : Kumbham
+Ganam           : Rakshasa
+Nadi            : Aadi
+Nakshatra Lord  : Rahu
+
+
+§2. VYAKTI SWABHAVAM (PERSONALITY)
+------------------------------------------------------------------------------
+The Lagna is Mithunam, ruled by Mercury. The Lagna lord is placed in house 12 (Vyaya (losses, foreign lands, moksha, expenditure, hidden enemies)), in Vrishabham. 
+The Moon in Kumbham (nakshatra Shatabhisha) colours the emotional nature: ganam is Rakshasa, nadi is Aadi. 
+The Sun in Mithunam (house 1) reflects the core identity and vitality. 
+The Rakshasa ganam suggests intense, willful temperament; strong-minded, sometimes unconventional.
+
+
+§3. BHAVA PHALAM (HOUSE ANALYSIS)
+------------------------------------------------------------------------------
+H 1 Tanu (body, self, personality, vitality, lagna)     Lord:Mercury  (in H12)  Occupants: Sun, Jupiter
+H 2 Dhana (wealth, family, speech, food, early educati  Lord:Moon     (in H9)  Occupants: Ketu
+H 3 Sahaja (siblings, courage, short travel, communica  Lord:Sun      (in H1)  Occupants: —
+H 4 Sukha (mother, home, vehicles, comforts, land, edu  Lord:Mercury  (in H12)  Occupants: —
+H 5 Putra (children, intelligence, mantras, purva-puny  Lord:Venus    (in H11)  Occupants: —
+H 6 Ari/Shatru (enemies, debts, disease, service, liti  Lord:Mars     (in H10)  Occupants: —
+H 7 Kalatra (spouse, marriage, partnerships, business)  Lord:Jupiter  (in H1)  Occupants: —
+H 8 Ayur (longevity, occult, sudden events, inheritanc  Lord:Saturn   (in H8)  Occupants: Saturn, Rahu
+H 9 Dharma (father, fortune, guru, higher learning, pi  Lord:Saturn   (in H8)  Occupants: Moon
+H10 Karma (career, status, authority, public life)      Lord:Jupiter  (in H1)  Occupants: Mars
+H11 Labha (gains, elder siblings, fulfilment of desire  Lord:Mars     (in H10)  Occupants: Venus
+H12 Vyaya (losses, foreign lands, moksha, expenditure,  Lord:Venus    (in H11)  Occupants: Mercury
+
+
+§4. YOGA PHALAM
+------------------------------------------------------------------------------
+=== Yoga Phalam ===
+
+● Durudhara Yoga  (दुरुधरा)   [Chandra]
+  Strength : Full
+  Basis    : Planets in both 2nd (Mars) and 12th (Saturn) from Moon
+  Result   : Wealth, comforts, generosity, servants and vehicles, happiness in family life.
+
+● Kuja Dosha (Mangal Dosha)  (कुजदोष)   [Dosha]
+  Strength : Full
+  Basis    : Mars in 1/2/4/7/8/12 from Chandra Lagna (house 2 from Moon) and from Sukra (house 12 from Venus)
+  Result   : May cause friction in marriage, delays, or temperamental issues with partner. Mitigated by matching with another Manglik, by Mars in own/exalted sign, by aspect of benefic, or after age 28. Specific parihara recommended.
+
+
+§5. VIMSHOTTARI DASHA — OVERVIEW
+------------------------------------------------------------------------------
+=== Vimshottari Dasha ===
+
+Rahu      Mahadasha   1990-06-15 → 1995-07-17   (5.09 yrs)
+
+Jupiter   Mahadasha   1995-07-17 → 2011-07-17   (16.00 yrs)
+
+Saturn    Mahadasha   2011-07-17 → 2030-07-17   (19.00 yrs)
+
+Mercury   Mahadasha   2030-07-17 → 2047-07-17   (17.00 yrs)
+
+Ketu      Mahadasha   2047-07-17 → 2054-07-17   (7.00 yrs)
+
+Venus     Mahadasha   2054-07-17 → 2074-07-17   (20.00 yrs)
+
+Sun       Mahadasha   2074-07-17 → 2080-07-16   (6.00 yrs)
+
+Moon      Mahadasha   2080-07-16 → 2090-07-17   (10.00 yrs)
+
+Mars      Mahadasha   2090-07-17 → 2097-07-16   (7.00 yrs)
+
+
+§6. CURRENT PERIOD — DASHA PHALAM
+------------------------------------------------------------------------------
+During the Mahadasha of Saturn (2011-07-17 → 2030-07-17, 19.0 years), the themes of Longevity, Discipline, Servants come to the fore.
+
+Saturn is placed in house 8 — Ayur (longevity, occult, sudden events, inheritance, transformation) — in Makaram, with Own sign (Swakshetra), retrograde. This is a dusthana placement, and Saturn also rules house 8 (Ayur), house 9 (Dharma). Saturn is neutral to the Lagna lord.
+
+In its own sign, Saturn gives stable, steady results across its significations.
+A dusthana placement asks for caution — health, debts, or hidden adversaries may demand attention. Such placements can also yield Vipareeta-style unexpected gains when other lords cooperate.
+
+Watch the antardashas of planets friendly to Saturn for opportunities; periods of Saturn's enemies will test patience.
+
+→ Saturn-Rahu period (2025-02-26 → 2028-01-03, 34.2 months): Rahu is a friend of Saturn. Rahu sits in house 8 (Makaram). A demanding sub-period — discipline and patience help; check transits before major decisions.
+
+
+§7. UPCOMING MAHADASHAS — KEY THEMES
+------------------------------------------------------------------------------
+
+During the Mahadasha of Mercury (2030-07-17 → 2047-07-17, 17.0 years), the themes of Intellect, Communication, Trade come to the fore.
+
+Mercury is placed in house 12 — Vyaya (losses, foreign lands, moksha, expenditure, hidden enemies) — in Vrishabham, with neutral strength. This is a dusthana placement, and Mercury also rules house 1 (Tanu), house 4 (Sukha). Mercury is the Lagna lord itself.
+
+With ordinary dignity, results will be mixed and shaped strongly by the antardasha lord and current transits.
+A dusthana placement asks for caution — health, debts, or hidden adversaries may demand attention. Such placements can also yield Vipareeta-style unexpected gains when other lords cooperate.
+
+Watch the antardashas of planets friendly to Mercury for opportunities; periods of Mercury's enemies will test patience.
+
+
+During the Mahadasha of Ketu (2047-07-17 → 2054-07-17, 7.0 years), the themes of Moksha, Detachment, Past karma come to the fore.
+
+Ketu is placed in house 2 — Dhana (wealth, family, speech, food, early education) — in Karkatakam, with retrograde. This is a other placement. Ketu is neutral to the Lagna lord.
+
+With ordinary dignity, results will be mixed and shaped strongly by the antardasha lord and current transits.
+
+Watch the antardashas of planets friendly to Ketu for opportunities; periods of Ketu's enemies will test patience.
+
+
+During the Mahadasha of Venus (2054-07-17 → 2074-07-17, 20.0 years), the themes of Spouse, Comforts, Arts come to the fore.
+
+Venus is placed in house 11 — Labha (gains, elder siblings, fulfilment of desires, networks) — in Mesham, with neutral strength. This is a upachaya placement, and Venus also rules house 5 (Putra), house 12 (Vyaya). Venus is friendly to the Lagna lord.
+
+With ordinary dignity, results will be mixed and shaped strongly by the antardasha lord and current transits.
+An upachaya placement means results improve with effort over time — the latter half of the dasha tends to be stronger than the start.
+
+Watch the antardashas of planets friendly to Venus for opportunities; periods of Venus's enemies will test patience.
+
+
+
+§8. NOTE
+------------------------------------------------------------------------------
+This reading is generated by a software system based on classical rules from Brihat Parashara Hora Shastra, Phaladeepika, and Kerala tradition. It indicates tendencies and karmic themes — not fixed outcomes. The Kerala tradition itself emphasises that conscious effort (purushartha) and parihara (remedial measures) can modify results. For major life decisions, consult a qualified human astrologer who can interpret subtleties this system may miss.
+══════════════════════════════════════════════════════════════════════════════

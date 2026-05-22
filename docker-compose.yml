@@ -1,0 +1,18 @@
+services:
+  room48-api:
+    build: .
+    container_name: room48-api
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+      # Pass through API key from host so the narrative layer works.
+      # Set ANTHROPIC_API_KEY in your shell before `docker compose up`.
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    volumes:
+      # Persist the narrative cache between container restarts
+      - room48_cache:/root/.room48
+
+volumes:
+  room48_cache:

@@ -1,0 +1,13 @@
+{
+  "name": "Sample Native",
+  "year": 1990,
+  "month": 6,
+  "day": 15,
+  "hour": 7,
+  "minute": 45,
+  "second": 0,
+  "latitude": 8.5241,
+  "longitude": 76.9366,
+  "timezone_name": "Asia/Kolkata",
+  "place_name": "Thiruvananthapuram, Kerala, India"
+}
