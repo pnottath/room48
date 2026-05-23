@@ -117,7 +117,6 @@ class AnthropicProvider(LLMProvider):
         msg = self._sync.messages.create(
             model=config.model,
             max_tokens=config.max_tokens,
-            temperature=config.temperature,
             system=system_blocks,
             messages=[{"role": "user", "content": user_prompt}],
         )
@@ -127,7 +126,6 @@ class AnthropicProvider(LLMProvider):
         msg = await self._async.messages.create(
             model=config.model,
             max_tokens=config.max_tokens,
-            temperature=config.temperature,
             system=system_blocks,
             messages=[{"role": "user", "content": user_prompt}],
         )
