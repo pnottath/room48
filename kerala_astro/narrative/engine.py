@@ -161,7 +161,7 @@ class NarrativeEngine:
         async, sections are generated concurrently under the hood.
         """
         opts = options or NarrativeOptions()
-        digest = build_chart_digest(chart, yogas, dashas)
+        digest = build_chart_digest(chart, yogas, dashas, language=opts.language)
 
         # 1) Response cache check
         if opts.use_response_cache:
