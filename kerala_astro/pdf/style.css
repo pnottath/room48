@@ -1,0 +1,266 @@
+/* ───────────────────────────────────────────────────────────────
+   Room 48 — PDF print stylesheet
+   ───────────────────────────────────────────────────────────────
+   Used by WeasyPrint to render Markdown readings as print-quality
+   PDFs. Mirrors the website's temple-paper palette so the website,
+   on-screen reading, and downloaded PDF feel like one document
+   in three formats.
+*/
+
+/* ── Fonts ─────────────────────────────────────────────────────
+   The PDF uses the system's default serif (Liberation/DejaVu/Times)
+   on whichever box runs WeasyPrint. We *bundle* Noto Sans Malayalam
+   because standard Debian images don't ship Malayalam coverage, and
+   without it the Unicode Malayalam glyphs render as tofu boxes.
+*/
+
+@font-face {
+  font-family: 'Noto Sans Malayalam';
+  src: url('fonts/NotoSansMalayalam-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  unicode-range: U+0D00-0D7F;  /* Malayalam block */
+}
+
+/* ── Page setup ────────────────────────────────────────────────
+   A4 portrait, generous margins. The footer is set via WeasyPrint's
+   @page rules — page numbers appear on every body page but NOT on
+   the cover page.
+*/
+
+@page {
+  size: A4 portrait;
+  margin: 22mm 20mm 26mm 20mm;
+
+  background: #F4ECD8;
+
+  @bottom-center {
+    content: "Room 48 · page " counter(page) " of " counter(pages);
+    font-family: 'Liberation Serif', 'DejaVu Serif', Georgia, serif;
+    font-style: italic;
+    font-size: 9pt;
+    color: #A98044;
+    padding-top: 8mm;
+    border-top: 0.3pt solid #D9C8A0;
+  }
+}
+
+@page :first {
+  /* Cover page — no footer, slightly different margins */
+  margin: 24mm 22mm;
+
+  @bottom-center {
+    content: "";
+    border-top: none;
+  }
+}
+
+/* ── Body baseline ─────────────────────────────────────────────*/
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #F4ECD8;
+  color: #1E1612;
+  font-family: 'Noto Sans Malayalam', 'Liberation Serif', 'DejaVu Serif', Georgia, serif;
+  font-size: 11pt;
+  line-height: 1.6;
+}
+
+/* ── Cover page ────────────────────────────────────────────────
+   Sized to fit all content on a single A4 page.
+*/
+.cover {
+  page-break-after: always;
+  text-align: center;
+  padding-top: 22mm;
+}
+
+/* The Aum is the silent opening — restrained in scale, present in
+   weight. 44pt sits dignified on an A4 page without dominating. */
+.cover .aum {
+  font-size: 44pt;
+  color: #A8401C;
+  margin: 0 0 14mm;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.cover .service-name {
+  font-size: 16pt;
+  font-weight: 700;
+  letter-spacing: -0.2pt;
+  margin: 0 0 3mm;
+  color: #1E1612;
+}
+
+.cover .ornament {
+  display: block;
+  text-align: center;
+  margin: 5mm 0 9mm;
+  color: #A98044;
+  letter-spacing: 6pt;
+  font-size: 12pt;
+}
+
+.cover .subtitle {
+  font-style: italic;
+  font-size: 12pt;
+  color: #5B463A;
+  margin: 0 0 22mm;
+}
+
+.cover .native-name {
+  font-size: 26pt;
+  font-weight: 700;
+  letter-spacing: -0.4pt;
+  margin: 0 0 10mm;
+  color: #1E1612;
+}
+
+/* Birth details laid out as a centered "card" — labels and values
+   sit on a common axis below the native's name, with the label
+   right-aligned and value left-aligned within a fixed-width frame
+   that is itself centered on the page. */
+.cover .birth-details {
+  display: table;
+  margin: 0 auto 24mm;
+  font-size: 11pt;
+  color: #1E1612;
+  line-height: 1.9;
+}
+
+.cover .birth-details > div {
+  display: table-row;
+}
+
+.cover .birth-details .label {
+  display: table-cell;
+  text-align: right;
+  padding-right: 6mm;
+  color: #A98044;
+  letter-spacing: 0.5pt;
+  font-size: 9pt;
+  text-transform: uppercase;
+  font-weight: 700;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.cover .birth-details .value {
+  display: table-cell;
+  text-align: left;
+  font-style: italic;
+  color: #5B463A;
+  vertical-align: middle;
+}
+
+.cover .spacer {
+  margin-top: 20mm;
+}
+
+.cover .generated-on {
+  font-size: 9pt;
+  color: #A98044;
+  font-style: italic;
+  margin: 0 0 5mm;
+  letter-spacing: 0.3pt;
+}
+
+.cover .dedication {
+  font-style: italic;
+  font-size: 10pt;
+  color: #5B463A;
+  margin: 0;
+  padding-top: 6mm;
+  border-top: 0.3pt solid #D9C8A0;
+}
+
+/* ── Section pages ─────────────────────────────────────────────
+   Each top-level reading section starts on a new page. The first
+   h1 doesn't break (it's the title), but every h2 does.
+*/
+
+.reading h1 {
+  font-size: 22pt;
+  font-weight: 700;
+  letter-spacing: -0.4pt;
+  margin: 0 0 6mm;
+  padding-bottom: 4mm;
+  border-bottom: 0.5pt solid #A98044;
+  color: #1E1612;
+  page-break-after: avoid;
+}
+
+.reading h2 {
+  font-size: 16pt;
+  font-weight: 700;
+  letter-spacing: -0.2pt;
+  margin: 12mm 0 6mm;
+  padding-bottom: 3mm;
+  border-bottom: 0.3pt solid #A98044;
+  color: #1E1612;
+  page-break-before: always;
+  page-break-after: avoid;
+}
+
+/* But the very first H2 (i.e. the first section after the H1 title)
+   should NOT force a new page — they belong together. */
+.reading h1 + h2,
+.reading > h2:first-child {
+  page-break-before: avoid;
+  margin-top: 6mm;
+}
+
+.reading p {
+  margin: 0 0 4mm;
+  text-align: justify;
+  hyphens: auto;
+  orphans: 3;
+  widows: 3;
+}
+
+.reading strong {
+  font-weight: 700;
+  color: #1E1612;
+}
+
+.reading em {
+  font-style: italic;
+  color: #5B463A;
+}
+
+/* ── Final page — disclaimer & closing ─────────────────────────*/
+
+.closing {
+  page-break-before: always;
+  text-align: center;
+  padding-top: 30mm;
+}
+
+.closing .small-aum {
+  font-size: 36pt;
+  color: #A8401C;
+  margin: 0 0 12mm;
+  line-height: 1;
+}
+
+.closing .disclaimer {
+  font-style: italic;
+  font-size: 10pt;
+  color: #5B463A;
+  line-height: 1.7;
+  max-width: 130mm;
+  margin: 0 auto 18mm;
+  text-align: center;
+  padding: 8mm;
+  border-top: 0.3pt solid #D9C8A0;
+  border-bottom: 0.3pt solid #D9C8A0;
+}
+
+.closing .tribute {
+  font-style: italic;
+  font-size: 10pt;
+  color: #A98044;
+  margin: 12mm 0 0;
+  letter-spacing: 0.5pt;
+}
