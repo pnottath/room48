@@ -57,6 +57,88 @@ NAKSHATRAS = [
     ("Revati",        "Mercury"),
 ]
 
+# Kerala-tradition Malayalam names for the 27 nakshatras (in Latin script).
+# Used in the chart digest so the LLM always has the local name available
+# when narrating — e.g. "Jyeshtha (Thriketta)".
+NAKSHATRA_MALAYALAM = {
+    "Ashwini":          "Ashwathi",
+    "Bharani":          "Bharani",
+    "Krittika":         "Karthika",
+    "Rohini":           "Rohini",
+    "Mrigashira":       "Makayiram",
+    "Ardra":            "Thiruvathira",
+    "Punarvasu":        "Punartham",
+    "Pushya":           "Pooyam",
+    "Ashlesha":         "Aayilyam",
+    "Magha":            "Makam",
+    "Purva Phalguni":   "Pooram",
+    "Uttara Phalguni":  "Uthram",
+    "Hasta":            "Atham",
+    "Chitra":           "Chithira",
+    "Swati":            "Chothi",
+    "Vishakha":         "Vishakham",
+    "Anuradha":         "Anizham",
+    "Jyeshtha":         "Thriketta",
+    "Moola":            "Moolam",
+    "Purva Ashadha":    "Pooradam",
+    "Uttara Ashadha":   "Uthradam",
+    "Shravana":         "Thiruvonam",
+    "Dhanishta":        "Avittam",
+    "Shatabhisha":      "Chathayam",
+    "Purva Bhadrapada": "Pooruruttathi",
+    "Uttara Bhadrapada":"Uthrattathi",
+    "Revati":           "Revathi",
+}
+
+# Same nakshatras in actual Malayalam script — used when the user requests
+# a Malayalam-script reading. Render alongside the Latin name for clarity.
+NAKSHATRA_MALAYALAM_SCRIPT = {
+    "Ashwini":          "അശ്വതി",
+    "Bharani":          "ഭരണി",
+    "Krittika":         "കാർത്തിക",
+    "Rohini":           "രോഹിണി",
+    "Mrigashira":       "മകയിരം",
+    "Ardra":            "തിരുവാതിര",
+    "Punarvasu":        "പുണർതം",
+    "Pushya":           "പൂയം",
+    "Ashlesha":         "ആയില്യം",
+    "Magha":            "മകം",
+    "Purva Phalguni":   "പൂരം",
+    "Uttara Phalguni":  "ഉത്രം",
+    "Hasta":            "അത്തം",
+    "Chitra":           "ചിത്തിര",
+    "Swati":            "ചോതി",
+    "Vishakha":         "വിശാഖം",
+    "Anuradha":         "അനിഴം",
+    "Jyeshtha":         "തൃക്കേട്ട",
+    "Moola":            "മൂലം",
+    "Purva Ashadha":    "പൂരാടം",
+    "Uttara Ashadha":   "ഉത്രാടം",
+    "Shravana":         "തിരുവോണം",
+    "Dhanishta":        "അവിട്ടം",
+    "Shatabhisha":      "ചതയം",
+    "Purva Bhadrapada": "പൂരുരുട്ടാതി",
+    "Uttara Bhadrapada":"ഉത്രട്ടാതി",
+    "Revati":           "രേവതി",
+}
+
+# Rasis in actual Malayalam script — used when the user requests Malayalam.
+# (The Latin-script Kerala names are already in RASIS above.)
+RASI_MALAYALAM_SCRIPT = {
+    "Mesham":     "മേടം",
+    "Vrishabham": "ഇടവം",
+    "Mithunam":   "മിഥുനം",
+    "Karkatakam": "കർക്കടകം",
+    "Simham":     "ചിങ്ങം",
+    "Kanni":      "കന്നി",
+    "Thulam":     "തുലാം",
+    "Vrischikam": "വൃശ്ചികം",
+    "Dhanu":      "ധനു",
+    "Makaram":    "മകരം",
+    "Kumbham":    "കുംഭം",
+    "Meenam":     "മീനം",
+}
+
 # Ganam classification per nakshatra: Deva / Manushya / Rakshasa
 NAKSHATRA_GANAM = {
     "Ashwini": "Deva", "Bharani": "Manushya", "Krittika": "Rakshasa",
