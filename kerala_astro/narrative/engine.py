@@ -29,6 +29,28 @@ from .prompts import (
 from .cache import NarrativeCache
 
 
+# Per-language scale factor on max_tokens.
+#
+# Malayalam Unicode characters consume roughly 2.5–3× the tokens that
+# Latin characters do; Latin-script Malayalam (Manglish) sits roughly 1.5×.
+# Without scaling, sections truncate mid-paragraph in non-English modes.
+# These factors were chosen empirically from the Anthropic tokenizer.
+_LANG_TOKEN_SCALE = {
+    "english":          1.0,
+    "manglish":         1.5,
+    "malayalam":        1.5,   # Latin-script transliteration — same as Manglish
+    "malayalam_script": 2.5,   # Real Malayalam Unicode — needs the most room
+}
+
+def _max_tokens_for(language: str, base: int) -> int:
+    """
+    Return a per-section token budget scaled for the language.
+    Capped at 8192 so we never exceed the model's per-response cap.
+    """
+    factor = _LANG_TOKEN_SCALE.get(language, 1.0)
+    return min(int(base * factor), 8192)
+
+
 # ---------------------------------------------------------------------------
 # Configuration / result dataclasses
 # ---------------------------------------------------------------------------
@@ -218,7 +240,7 @@ class NarrativeEngine:
         config = LLMConfig(
             model=opts.model,
             temperature=opts.temperature,
-            max_tokens=opts.max_tokens_per_section,
+            max_tokens=_max_tokens_for(opts.language, opts.max_tokens_per_section),
         )
         valid_secs = [s for s in opts.sections if s in BRIEFS]
         briefs = [BRIEFS[s] for s in valid_secs]
@@ -246,7 +268,7 @@ class NarrativeEngine:
         config = LLMConfig(
             model=opts.model,
             temperature=opts.temperature,
-            max_tokens=opts.max_tokens_per_section,
+            max_tokens=_max_tokens_for(opts.language, opts.max_tokens_per_section),
         )
         sections: Dict[str, str] = {}
         usage = NarrativeUsage(provider=self.provider.name)
