@@ -22,7 +22,7 @@ from typing import Optional
 
 from fastapi import FastAPI, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import PlainTextResponse, JSONResponse
+from fastapi.responses import PlainTextResponse, JSONResponse, Response
 import swisseph as swe
 from timezonefinder import TimezoneFinder
 
@@ -37,6 +37,7 @@ from .schemas import (
     BirthDataRequest, HoroscopeResponse, ChartResponse, YogaResponse,
     DashaResponse, HealthResponse, ErrorResponse,
     NarrativeRequest, NarrativeResponse, NarrativeSectionResponse,
+    NarrativePdfRequest,
 )
 from .converters import (
     chart_to_response, yoga_to_response, dasha_to_response,
@@ -370,5 +371,72 @@ def generate_narrative(req: NarrativeRequest):
             "cache_write_tokens":   result.usage.total_cache_write,
             "prompt_cache_hits":    sum(1 for s in result.usage.sections if s.cache_hit),
             "sections_generated":   len(result.usage.sections),
+        },
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# PDF export — takes an already-generated reading and returns a PDF.
+# NO LLM call. NO additional Anthropic cost.
+# ─────────────────────────────────────────────────────────────────────────
+
+@app.post("/api/v1/narrative-pdf",
+          tags=["narrative"],
+          summary="Render an already-generated reading as a print-quality PDF",
+          responses={
+              200: {"content": {"application/pdf": {}},
+                    "description": "The reading as a downloadable PDF."},
+              422: {"model": ErrorResponse},
+              500: {"model": ErrorResponse},
+          })
+def generate_narrative_pdf(req: NarrativePdfRequest):
+    """
+    Render a previously-generated reading as a typeset PDF.
+
+    The frontend already has the reading's Markdown (from /api/v1/narrative).
+    It POSTs that markdown plus the cover-page metadata here, and gets back
+    application/pdf bytes — no further LLM call is made.
+
+    The PDF reuses the temple-paper palette and Kerala-tradition styling.
+    """
+    # Defer the import so the API boots even if WeasyPrint's native deps
+    # are temporarily missing from the container (the error then surfaces
+    # only on the PDF endpoint, not at FastAPI startup).
+    try:
+        from ..pdf import render_reading_pdf, ReadingPdfInput
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"PDF renderer unavailable: {e}",
+        )
+
+    try:
+        pdf_bytes = render_reading_pdf(ReadingPdfInput(
+            native_name = req.native_name,
+            markdown    = req.markdown,
+            disclaimer  = req.disclaimer,
+            birth_date  = req.birth_date,
+            birth_time  = req.birth_time,
+            birth_tz    = req.birth_tz,
+            birth_place = req.birth_place,
+            generated_on= req.generated_on,
+        ))
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"PDF rendering failed: {e}",
+        )
+
+    # Build a friendly download filename:  Room48-Reading-<Name>-<YYYYMMDD>.pdf
+    safe_name = "".join(ch if ch.isalnum() else "" for ch in req.native_name) or "Reading"
+    stamp = datetime.now().strftime("%Y%m%d")
+    filename = f"Room48-Reading-{safe_name}-{stamp}.pdf"
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "no-store",
         },
     )
