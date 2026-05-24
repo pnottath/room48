@@ -247,3 +247,29 @@ class NarrativeResponse(BaseModel):
     usage: Optional[Dict[str, Any]] = Field(
         None,
         description="Token usage and cache telemetry for this request.")
+
+
+# ────────────────────────────────────────────────────────────────────
+# PDF export
+# ────────────────────────────────────────────────────────────────────
+
+class NarrativePdfRequest(BaseModel):
+    """
+    Request for /api/v1/narrative-pdf — takes an ALREADY-GENERATED
+    reading (the markdown the frontend just displayed) and returns a
+    typeset PDF. No LLM call is made; no Anthropic cost is incurred.
+    """
+    native_name: str = Field(..., description="The person's name as printed on the cover.")
+    markdown: str = Field(..., description="The full reading in Markdown — the same content the frontend displayed.")
+    disclaimer: str = Field(..., description="Disclaimer text for the closing page.")
+
+    # Birth details for the cover page. The caller (frontend) supplies
+    # these already formatted so we don't have to know about locales.
+    birth_date: str = Field(..., description="Pre-formatted birth date, e.g. '15 June 1990'.")
+    birth_time: str = Field(..., description="Pre-formatted birth time, e.g. '07:45'.")
+    birth_tz:   str = Field(..., description="Timezone, e.g. 'Asia/Kolkata'.")
+    birth_place: str = Field(..., description="Birthplace, e.g. 'Thiruvananthapuram, Kerala'.")
+
+    # Optional — the cover shows when the reading was generated. If
+    # omitted, the server uses 'now'.
+    generated_on: Optional[str] = Field(None, description="Optional pre-formatted date, e.g. '24 May 2026'.")
