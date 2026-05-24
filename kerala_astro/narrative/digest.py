@@ -14,22 +14,47 @@ from ..core.dasha import DashaPeriod, find_current_dasha, find_current_antardash
 from ..core.yogas import Yoga
 from ..core.constants import (
     NAKSHATRA_GANAM, NAKSHATRA_NADI, RASI_LORDS, BHAVA_MEANINGS, GRAHAS,
-    NATURAL_KARAKAS,
+    NATURAL_KARAKAS, NAKSHATRA_MALAYALAM, NAKSHATRA_MALAYALAM_SCRIPT,
+    RASI_MALAYALAM_SCRIPT,
 )
+
+
+def _nak_name(nak: str, script: bool = False) -> str:
+    """
+    Render a nakshatra with its Kerala name in brackets:
+        _nak_name("Jyeshtha")        → "Jyeshtha (Thriketta)"
+        _nak_name("Jyeshtha", True)  → "Jyeshtha (Thriketta / തൃക്കേട്ട)"
+    """
+    mal = NAKSHATRA_MALAYALAM.get(nak)
+    if not mal:
+        return nak
+    if script:
+        ml = NAKSHATRA_MALAYALAM_SCRIPT.get(nak, "")
+        return f"{nak} ({mal} / {ml})" if ml else f"{nak} ({mal})"
+    return f"{nak} ({mal})"
+
+
+def _rasi_name(rasi: str, script: bool = False) -> str:
+    """Render a rasi, optionally with Malayalam script appended."""
+    if script:
+        ml = RASI_MALAYALAM_SCRIPT.get(rasi, "")
+        return f"{rasi} ({ml})" if ml else rasi
+    return rasi
 
 
 # ---------------------------------------------------------------------------
 # Core helpers
 # ---------------------------------------------------------------------------
 
-def _planet_lines(chart: Chart) -> str:
+def _planet_lines(chart: Chart, script: bool = False) -> str:
     rows = ["| Planet | Rasi | Deg | House | Nakshatra | Pada | Dignity | Retro |",
             "|---|---|---|---|---|---|---|---|"]
     for name in GRAHAS:
         p = chart.planets[name]
         rows.append(
-            f"| {p.name} | {p.rasi_name} | {p.degrees_in_rasi:.2f}° "
-            f"| {p.house} | {p.nakshatra} | {p.pada} "
+            f"| {p.name} | {_rasi_name(p.rasi_name, script)} "
+            f"| {p.degrees_in_rasi:.2f}° "
+            f"| {p.house} | {_nak_name(p.nakshatra, script)} | {p.pada} "
             f"| {p.dignity or '—'} | {'Yes' if p.retrograde else 'No'} |"
         )
     return "\n".join(rows)
@@ -108,12 +133,17 @@ def _current_period_block(chart: Chart, dashas: List[DashaPeriod]) -> str:
 
 def build_chart_digest(chart: Chart,
                        yogas: List[Yoga],
-                       dashas: List[DashaPeriod]) -> str:
+                       dashas: List[DashaPeriod],
+                       language: str = "english") -> str:
     """
     Produce the canonical factual digest that the LLM must rely on.
-    Returned string is ~1500-2500 tokens — small enough to include verbatim
-    in every section's prompt.
+
+    Nakshatra names are always rendered with their Kerala name in brackets:
+        "Jyeshtha (Thriketta)" for English/Manglish output
+        "Jyeshtha (Thriketta / തൃക്കേട്ട)" for true Malayalam-script output
+    so the narrator can preserve them naturally in prose.
     """
+    script = (language == "malayalam_script")
     b = chart.birth
     moon = chart.planets["Moon"]
     lagna_lord = RASI_LORDS[chart.lagna_rasi_index]
@@ -131,26 +161,27 @@ def build_chart_digest(chart: Chart,
         f"- Coordinates: {b.latitude:.4f}°N, {b.longitude:.4f}°E"
     )
 
-    # 2. Lagna / Janma core
+    # 2. Lagna / Janma core — with Kerala/Malayalam names
     parts.append("\n## LAGNA & JANMA CORE")
     parts.append(
-        f"- Lagna (Ascendant): **{chart.lagna_rasi_name}** "
+        f"- Lagna (Ascendant): **{_rasi_name(chart.lagna_rasi_name, script)}** "
         f"{chart.lagna_longitude % 30:.2f}° "
-        f"(nakshatra {chart.lagna_nakshatra}, pada {chart.lagna_pada})\n"
+        f"(nakshatra {_nak_name(chart.lagna_nakshatra, script)}, "
+        f"pada {chart.lagna_pada})\n"
         f"- Lagna lord: **{lagna_lord}** in house {ll_planet.house} "
-        f"({ll_planet.rasi_name}"
+        f"({_rasi_name(ll_planet.rasi_name, script)}"
         f"{', ' + ll_planet.dignity.lower() if ll_planet.dignity else ''})\n"
-        f"- Janma Rasi (Moon-sign): **{moon.rasi_name}**\n"
-        f"- Janma Nakshatra: **{moon.nakshatra}** pada {moon.pada} "
-        f"(lord {moon.nakshatra_lord})\n"
+        f"- Janma Rasi (Moon-sign): **{_rasi_name(moon.rasi_name, script)}**\n"
+        f"- Janma Nakshatra: **{_nak_name(moon.nakshatra, script)}** "
+        f"pada {moon.pada} (lord {moon.nakshatra_lord})\n"
         f"- Ganam: {NAKSHATRA_GANAM[moon.nakshatra]}, "
         f"Nadi: {NAKSHATRA_NADI[moon.nakshatra]}\n"
         f"- Ayanamsa (Lahiri): {chart.ayanamsa:.4f}°"
     )
 
-    # 3. Planets
+    # 3. Planets — with bracketed Kerala names in the Nakshatra column
     parts.append("\n## PLANETARY POSITIONS")
-    parts.append(_planet_lines(chart))
+    parts.append(_planet_lines(chart, script))
 
     # 4. Houses
     parts.append("\n## BHAVAS (HOUSES)")
