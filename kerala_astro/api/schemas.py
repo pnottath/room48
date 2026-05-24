@@ -178,7 +178,7 @@ class ErrorResponse(BaseModel):
 # Narrative layer
 # ---------------------------------------------------------------------------
 
-VALID_LANGUAGES = ("english", "manglish", "malayalam")
+VALID_LANGUAGES = ("english", "manglish", "malayalam", "malayalam_script")
 VALID_SECTIONS = ("overview", "personality", "bhava", "yogas",
                   "current_dasha", "upcoming", "closing")
 
@@ -187,9 +187,11 @@ class NarrativeRequest(BirthDataRequest):
     """Same as BirthDataRequest plus narrative options."""
     language: str = Field(
         "english",
-        description=("Output language. 'english' = clear English, "
+        description=("Output language. "
+                     "'english' = clear English, "
                      "'manglish' = Malayalam-English mix in Latin script, "
-                     "'malayalam' = Malayalam in Latin transliteration."))
+                     "'malayalam' = Malayalam in Latin transliteration, "
+                     "'malayalam_script' = actual Malayalam script (മലയാളം)."))
     sections: Optional[List[str]] = Field(
         None,
         description=("Which sections to generate. If omitted, all sections "
