@@ -199,16 +199,16 @@ html, body {
   padding-bottom: 3mm;
   border-bottom: 0.3pt solid #A98044;
   color: #1E1612;
-  page-break-before: always;
   page-break-after: avoid;
 }
 
-/* But the very first H2 (i.e. the first section after the H1 title)
-   should NOT force a new page — they belong together. */
-.reading h1 + h2,
-.reading > h2:first-child {
+/* Each section is a discrete unit that breaks to a new page,
+   EXCEPT the first one (which sits on the same page as the H1 title). */
+.reading section {
+  page-break-before: always;
+}
+.reading h1 + section {
   page-break-before: avoid;
-  margin-top: 6mm;
 }
 
 .reading p {
@@ -222,6 +222,64 @@ html, body {
 .reading strong {
   font-weight: 700;
   color: #1E1612;
+}
+
+/* ── "At a glance" preamble treatment ──────────────────────────
+   The summary section is for casual readers who'd otherwise find
+   the deep reading overwhelming. It sits in its own framed block,
+   with smaller text and a softer heading, so it visually reads as
+   preamble rather than as chapter 1. */
+.reading .sec-at-a-glance {
+  border: 0.4pt solid #A8401C;
+  background: rgba(168, 64, 28, 0.04);  /* the lightest tint of saffron */
+  padding: 9mm 10mm 6mm;
+  margin: 2mm 0 10mm;
+  border-radius: 1mm;
+}
+
+.reading .sec-at-a-glance h2 {
+  font-size: 13pt;
+  font-weight: 700;
+  margin: 0 0 5mm;
+  padding-bottom: 2mm;
+  border-bottom: 0.2pt solid #A98044;
+  color: #A8401C;
+  letter-spacing: 0.4pt;
+  text-transform: uppercase;
+  /* This is the first H2 after the title, so it shouldn't break to
+     a new page. The general rule already handles that. */
+}
+
+.reading .sec-at-a-glance p {
+  font-size: 10pt;
+  line-height: 1.55;
+  text-align: left;       /* not justified — flows better for short paras */
+  margin: 0 0 3mm;
+  color: #1E1612;
+}
+
+.reading .sec-at-a-glance p:last-child {
+  margin-bottom: 0;
+  font-style: italic;
+  color: #5B463A;
+  font-size: 9pt;
+  margin-top: 4mm;
+  padding-top: 3mm;
+  border-top: 0.2pt dotted #D9C8A0;
+}
+
+.reading .sec-at-a-glance strong {
+  display: block;
+  color: #A8401C;
+  font-size: 10pt;
+  margin-top: 4mm;
+  margin-bottom: 1mm;
+  letter-spacing: 0.2pt;
+}
+
+/* First strong (i.e. first sub-heading) needs no extra top margin */
+.reading .sec-at-a-glance p:first-of-type strong:first-child {
+  margin-top: 0;
 }
 
 .reading em {
