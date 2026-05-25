@@ -30,7 +30,7 @@ def main():
     ap.add_argument("--section", action="append",
                     help="Generate only this section (can be repeated). "
                          f"Choices: {section_ids()}")
-    ap.add_argument("--model", default="claude-opus-4-7")
+    ap.add_argument("--model", default="claude-sonnet-4-6")
     ap.add_argument("--temperature", type=float, default=0.55)
     ap.add_argument("--output", "-o", default=None,
                     help="Write Markdown to this file instead of stdout.")
