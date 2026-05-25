@@ -113,41 +113,54 @@ def system_blocks(language: str, digest: str) -> list[dict]:
 # persona and the digest; the user message just says "render section X".
 
 BRIEFS = {
-    "overview": """Write a brief opening to the janma kundali reading (around 150-200 words). Address the native warmly by name once, identify the lagnam, janma rasi, and janma nakshatram (with ganam and nadi), and indicate the lagna lord's placement at a high level. Set the tone for the rest of the reading. Do NOT list every planet.""",
+    "overview": """Write a brief opening to the janma kundali reading (around 150-200 words). Address the native warmly by name once, identify the lagnam, janma rasi, and janma nakshatram (with ganam and nadi), and indicate the lagna lord's placement at a high level. Set the tone for the rest of the reading. Do NOT list every planet.
 
-    "personality": """Write the **Vyakti Swabhavam (personality)** section (around 250-350 words). Focus on:
+CRITICAL: Begin directly with the prose. Do NOT write any heading, title, section name, or bold opener like "Opening" or "**Opening**" — the section title will be added separately.""",
+
+    "personality": """Write the personality section (around 250-350 words). Focus on:
 - Lagna and lagna lord's placement → outer personality and life direction.
 - Moon (Chandra) and its rasi/nakshatra → emotional nature, mind, instinct.
 - Sun (Surya) and its house placement → core identity, vitality.
 - The ganam-nadi combination of the janma nakshatram.
 - Any planet conjunct or aspecting the lagna or Moon, ONLY if it appears in the digest.
-Weave these into flowing prose. Do not list them mechanically.""",
+Weave these into flowing prose. Do not list them mechanically.
 
-    "bhava": """Write the **Bhava Phalam (house-by-house outlook)** section (around 400-600 words). Cover all twelve bhavas in flowing prose grouped naturally (1-3, 4-6, 7-9, 10-12). For each bhava, mention the lord's placement and any occupants from the digest's house table. Comment on whether the bhava is strong, weak, or mixed based ONLY on the digest. Treat sensitive bhavas (6th, 8th, 12th, marriage) with care, without doom-mongering.""",
+CRITICAL: Begin directly with the prose. Do NOT write any heading, title, section name, or bold opener like "**Vyakti Swabhavam**" — the section title will be added separately.""",
 
-    "yogas": """Write the **Yoga Phalam** section (around 250-400 words). For EACH yoga in the digest's "YOGAS DETECTED" section:
+    "bhava": """Write the house-by-house outlook (around 400-600 words). Cover all twelve bhavas in flowing prose grouped naturally (1-3, 4-6, 7-9, 10-12). For each bhava, mention the lord's placement and any occupants from the digest's house table. Comment on whether the bhava is strong, weak, or mixed based ONLY on the digest. Treat sensitive bhavas (6th, 8th, 12th, marriage) with care, without doom-mongering.
+
+CRITICAL: Begin directly with the prose. Do NOT write any heading, title, section name, or bold opener like "**Bhava Phalam**" — the section title will be added separately.""",
+
+    "yogas": """Write the yoga combinations section (around 250-400 words). For EACH yoga in the digest's "YOGAS DETECTED" section:
 - Name the yoga in Sanskrit and English.
 - Explain the planetary basis quoted directly from the digest.
 - Describe the classical effect in the natural voice of an astrologer.
 - For any dosha, discuss mitigation honestly and mention Kerala parihara as cultural context — temples like Mannarasala, Chottanikkara, Pambumekkattu, or remedies like mantra japa and daana. Do NOT prescribe medical or psychological action.
 
-CRITICAL: do not introduce any yoga that is not in the digest.""",
+CRITICAL: Do NOT introduce any yoga that is not in the digest.
+CRITICAL: Begin directly with the prose. Do NOT write any heading, title, section name, or bold opener like "**Yoga Phalam**" — the section title will be added separately.""",
 
-    "current_dasha": """Write the **Current Dasa Phalam** section (around 300-450 words). Focus tightly on:
+    "current_dasha": """Write the section on the currently-running dasa period (around 300-450 words). Focus tightly on:
 - The Mahadasha currently running (name, lord, dates from the digest).
 - The natal placement of the dasha lord, its dignity, its house ownership.
 - The Antardasha currently running and its lord's natal placement.
 - Likely themes for this period — career, relationships, health, finance, spirituality — interpreted from the dasha lord's karakas, house placement, and dignity AS STATED IN THE DIGEST.
 - Practical guidance: where to invest energy, where to be patient.
-Be specific to the digest. Avoid generic horoscope-column language.""",
+Be specific to the digest. Avoid generic horoscope-column language.
 
-    "upcoming": """Write the **Upcoming Dasa Phalam** section (around 250-400 words). Discuss the next 2-3 Mahadashas following the current one (from the dasha table). For each:
+CRITICAL: Begin directly with the prose. Do NOT write any heading, title, section name, or bold opener like "**Current Dasa Phalam**" — the section title will be added separately.""",
+
+    "upcoming": """Write the section on upcoming dasa periods (around 250-400 words). Discuss the next 2-3 Mahadashas following the current one (from the dasha table). For each:
 - State the lord, start year, end year as in the digest.
 - Note the lord's natal placement and dignity from the digest.
 - Sketch the likely themes and rhythm of that period.
-Keep it forward-looking but tempered — tendencies, not certainties.""",
+Keep it forward-looking but tempered — tendencies, not certainties.
 
-    "closing": """Write a closing paragraph (around 100-150 words) summing up the chart's central karmic theme — the conversation between the lagna lord, the Moon, and any prominent yogas in the digest. End with a brief note that astrology indicates tendencies, that conscious effort (purushartha) and parihara shape outcomes, and that for major life decisions the native should consult both a qualified astrologer and the relevant domain professionals. Do NOT predict death, illness, or specific catastrophes.""",
+CRITICAL: Begin directly with the prose. Do NOT write any heading, title, section name, or bold opener like "**Upcoming Dasa Phalam**" — the section title will be added separately.""",
+
+    "closing": """Write a closing paragraph (around 100-150 words) summing up the chart's central karmic theme — the conversation between the lagna lord, the Moon, and any prominent yogas in the digest. End with a brief note that astrology indicates tendencies, that conscious effort (purushartha) and parihara shape outcomes, and that for major life decisions the native should consult both a qualified astrologer and the relevant domain professionals. Do NOT predict death, illness, or specific catastrophes.
+
+CRITICAL: Begin directly with the prose. Do NOT write any heading, title, section name, or bold opener like "**Closing**" — the section title will be added separately.""",
 }
 
 
