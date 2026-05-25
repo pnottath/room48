@@ -59,7 +59,7 @@ def _max_tokens_for(language: str, base: int) -> int:
 class NarrativeOptions:
     language: str = "english"
     sections: List[str] = field(default_factory=section_ids)
-    model: str = "claude-opus-4-7"
+    model: str = "claude-sonnet-4-6"
     temperature: float = 0.55
     max_tokens_per_section: int = 1600
     use_response_cache: bool = True
