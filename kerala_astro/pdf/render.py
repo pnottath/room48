@@ -108,33 +108,67 @@ _ITALIC_RE = re.compile(r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)")  # single * not 
 _H1_RE     = re.compile(r"^# (.+)$", re.MULTILINE)
 _H2_RE     = re.compile(r"^## (.+)$", re.MULTILINE)
 
+def _section_class(heading: str) -> str:
+    """Derive a CSS-safe class name from an H2 heading.
+       'At a glance' → 'sec-at-a-glance'
+       'Vyakti Swabhavam — Personality' → 'sec-vyakti-swabhavam'
+       This lets CSS style specific sections differently (e.g. the
+       summary section gets a softer "preamble" treatment).
+    """
+    base = re.sub(r"[^a-z0-9]+", "-", heading.lower()).strip("-")
+    # Cap length to first 2-3 words for clarity
+    parts = base.split("-")
+    return "sec-" + "-".join(parts[:4]) if parts else "sec"
+
 def _markdown_to_html(md: str) -> str:
-    """Convert the reading's markdown to safe HTML for the PDF body."""
+    """Convert the reading's markdown to safe HTML for the PDF body.
+
+       Each ## section becomes <section class="sec-{slug}"><h2>...</h2>...</section>
+       so CSS can target individual sections without parsing HTML."""
     # 1. Escape everything first
     s = _html.escape(md)
 
-    # 2. Headings (process h2 before h1 isn't needed since both anchor on ^)
-    s = _H1_RE.sub(r"<h1>\1</h1>", s)
-    s = _H2_RE.sub(r"<h2>\1</h2>", s)
-
-    # 3. Bold / italic — order matters: bold first, then italic, so
+    # 2. Bold / italic — order matters: bold first, then italic, so
     #    "**word**" doesn't get caught by the italic regex.
     s = _BOLD_RE.sub(r"<strong>\1</strong>", s)
     s = _ITALIC_RE.sub(r"<em>\1</em>", s)
 
-    # 4. Split on blank lines; wrap non-heading blocks in <p>
-    out_blocks = []
-    for block in re.split(r"\n{2,}", s):
+    # 3. Split on blank lines, then group blocks into sections based on H2 headings
+    blocks = re.split(r"\n{2,}", s)
+    out_html = []
+    current_section: list[str] = []
+    current_section_class: str = ""
+
+    def flush_section():
+        if current_section:
+            opener = f'<section class="{current_section_class}">' if current_section_class else "<section>"
+            out_html.append(opener + "\n" + "\n".join(current_section) + "\n</section>")
+
+    for block in blocks:
         block = block.strip()
         if not block:
             continue
-        if block.startswith("<h1>") or block.startswith("<h2>"):
-            out_blocks.append(block)
+        m_h1 = _H1_RE.match(block)
+        m_h2 = _H2_RE.match(block)
+        if m_h1:
+            # Close any open section, then emit standalone H1
+            flush_section()
+            current_section = []
+            current_section_class = ""
+            out_html.append(f"<h1>{m_h1.group(1)}</h1>")
+        elif m_h2:
+            # New section: flush the previous one, open a new container
+            flush_section()
+            heading_text = m_h2.group(1)
+            current_section = [f"<h2>{heading_text}</h2>"]
+            current_section_class = _section_class(heading_text)
         else:
-            # Preserve single newlines as line breaks within a paragraph
+            # Body paragraph (possibly multi-line within the same block)
             inner = block.replace("\n", "<br/>")
-            out_blocks.append(f"<p>{inner}</p>")
-    return "\n".join(out_blocks)
+            current_section.append(f"<p>{inner}</p>")
+
+    flush_section()
+    return "\n".join(out_html)
 
 
 def _today_human() -> str:
