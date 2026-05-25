@@ -117,6 +117,11 @@ app.add_middleware(
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
+    # By default the browser does NOT let cross-origin JS read response
+    # headers other than a tiny safelist. We need Content-Disposition
+    # so the PDF download flow can pick up the friendly filename
+    # ("Prasanth Nottath Room48 Jaathakam.pdf") that the backend builds.
+    expose_headers=["Content-Disposition"],
 )
 
 
