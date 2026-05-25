@@ -19,6 +19,11 @@ Then open:
 
 from datetime import datetime
 from typing import Optional
+import hashlib
+import json
+import threading
+import time
+import logging
 
 from fastapi import FastAPI, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,6 +37,46 @@ from ..core.dasha import (compute_vimshottari, find_current_dasha,
 from ..core.yogas import detect_all_yogas
 from ..core.interpret import interpret_antardasha
 from ..agent.horoscope_agent import HoroscopeAgent
+
+# ─────────────────────────────────────────────────────────────────────────
+# In-flight request deduplication
+# ─────────────────────────────────────────────────────────────────────────
+# When two requests arrive for the same chart+language+sections combination
+# while the first is still running its LLM calls, the second waits for the
+# first to finish rather than firing its own parallel burst of section
+# generations. This plugs the most common cost-leak: a user hitting
+# "Generate reading" again before the first request returned.
+#
+# The registry maps a content hash to an Event that fires when the request
+# completes, plus a shared result dict.
+
+_INFLIGHT_LOCK = threading.Lock()
+_INFLIGHT: dict[str, "_InflightEntry"] = {}
+_INFLIGHT_WAIT_SECONDS = 180   # max we'll keep a follower waiting
+
+class _InflightEntry:
+    __slots__ = ("event", "result", "exc", "started_at")
+    def __init__(self):
+        self.event = threading.Event()
+        self.result = None
+        self.exc: Optional[Exception] = None
+        self.started_at = time.time()
+
+def _narrative_dedup_key(req) -> str:
+    """A stable content hash for an inflight request."""
+    payload = json.dumps({
+        "year": req.year, "month": req.month, "day": req.day,
+        "hour": req.hour, "minute": req.minute,
+        "lat": round(req.latitude, 4), "lon": round(req.longitude, 4),
+        "tz":  req.timezone_name,
+        "lang": req.language,
+        "model": req.model,
+        "temp": round(req.temperature, 2),
+        "sections": sorted(req.sections) if req.sections else "all",
+    }, sort_keys=True)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+
+_log = logging.getLogger("kerala_astro.narrative")
 
 from .schemas import (
     BirthDataRequest, HoroscopeResponse, ChartResponse, YogaResponse,
@@ -312,6 +357,12 @@ def generate_narrative(req: NarrativeRequest):
     Provider is chosen by environment:
       - ANTHROPIC_API_KEY set → AnthropicProvider (real LLM)
       - otherwise            → EchoProvider (no network calls, for tests)
+
+    Includes in-flight request deduplication: if a request for the
+    identical chart+language+sections combination is already running,
+    a second arrival waits for the first to complete rather than
+    firing its own LLM calls. This prevents the most common cost-leak
+    (impatient users re-tapping "Generate reading").
     """
     birth = _to_birthdata(req)
     chart = _safe_compute(birth)
@@ -337,42 +388,83 @@ def generate_narrative(req: NarrativeRequest):
         parallel=req.parallel,
     )
 
+    # ── In-flight dedup ─────────────────────────────────────────────
+    dedup_key = _narrative_dedup_key(req)
+    is_follower = False
+    entry = None
+    with _INFLIGHT_LOCK:
+        existing = _INFLIGHT.get(dedup_key)
+        if existing is not None and not existing.event.is_set():
+            entry = existing
+            is_follower = True
+            _log.info("dedup: follower joining in-flight request %s", dedup_key)
+        else:
+            entry = _InflightEntry()
+            _INFLIGHT[dedup_key] = entry
+
+    if is_follower:
+        # Wait for the leading request to complete, with a ceiling so we
+        # don't hang forever if something went wrong with the leader.
+        if not entry.event.wait(timeout=_INFLIGHT_WAIT_SECONDS):
+            raise HTTPException(
+                status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+                detail="Reading is still being generated. Please try again in a moment.",
+            )
+        if entry.exc is not None:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Reading generation failed: {entry.exc}",
+            )
+        return entry.result
+
+    # We are the leader — actually generate.
     try:
-        result = engine.generate(chart, yogas, dashas, options)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"LLM generation failed: {e}",
-        )
+        try:
+            result = engine.generate(chart, yogas, dashas, options)
+        except Exception as e:
+            entry.exc = e
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"LLM generation failed: {e}",
+            )
 
-    section_models = [
-        NarrativeSectionResponse(
-            section=sid,
-            title=SECTION_HEADERS[sid],
-            text=result.sections.get(sid, ""),
-        )
-        for sid in section_ids
-        if sid in result.sections
-    ]
+        section_models = [
+            NarrativeSectionResponse(
+                section=sid,
+                title=SECTION_HEADERS[sid],
+                text=result.sections.get(sid, ""),
+            )
+            for sid in section_ids
+            if sid in result.sections
+        ]
 
-    return NarrativeResponse(
-        language=req.language,
-        model=req.model,
-        provider=result.provider_name,
-        sections=section_models,
-        markdown=result.to_markdown(include_digest=req.include_digest_in_response),
-        digest=result.digest if req.include_digest_in_response else None,
-        disclaimer=DISCLAIMER,
-        usage={
-            "response_cache_hit":   result.usage.response_cache_hit,
-            "total_input_tokens":   result.usage.total_input,
-            "total_output_tokens":  result.usage.total_output,
-            "cache_read_tokens":    result.usage.total_cache_read,
-            "cache_write_tokens":   result.usage.total_cache_write,
-            "prompt_cache_hits":    sum(1 for s in result.usage.sections if s.cache_hit),
-            "sections_generated":   len(result.usage.sections),
-        },
-    )
+        response = NarrativeResponse(
+            language=req.language,
+            model=req.model,
+            provider=result.provider_name,
+            sections=section_models,
+            markdown=result.to_markdown(include_digest=req.include_digest_in_response),
+            digest=result.digest if req.include_digest_in_response else None,
+            disclaimer=DISCLAIMER,
+            usage={
+                "response_cache_hit":   result.usage.response_cache_hit,
+                "total_input_tokens":   result.usage.total_input,
+                "total_output_tokens":  result.usage.total_output,
+                "cache_read_tokens":    result.usage.total_cache_read,
+                "cache_write_tokens":   result.usage.total_cache_write,
+                "prompt_cache_hits":    sum(1 for s in result.usage.sections if s.cache_hit),
+                "sections_generated":   len(result.usage.sections),
+            },
+        )
+        entry.result = response
+        return response
+    finally:
+        # Signal followers and clean up.
+        entry.event.set()
+        with _INFLIGHT_LOCK:
+            # Only remove if it's still us (could've been overwritten)
+            if _INFLIGHT.get(dedup_key) is entry:
+                del _INFLIGHT[dedup_key]
 
 
 # ─────────────────────────────────────────────────────────────────────────
