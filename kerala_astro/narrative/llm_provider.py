@@ -20,7 +20,7 @@ from typing import Optional
 @dataclass
 class LLMConfig:
     """Generation parameters."""
-    model: str = "claude-opus-4-7"
+    model: str = "claude-sonnet-4-6"
     max_tokens: int = 1600
     temperature: float = 0.55
 
@@ -113,19 +113,33 @@ class AnthropicProvider(LLMProvider):
             cache_read_tokens=getattr(usage, "cache_read_input_tokens", 0) if usage else 0,
         )
 
+    # Per-call timeout in seconds. The Anthropic SDK defaults to 600s
+    # (10 minutes) which is far too long — a stuck section call would
+    # tie up resources and continue burning tokens until the SDK gave
+    # up. 90s is comfortable for our largest section size on Sonnet
+    # 4.6 (~2400 output tokens, normally <60s) while ensuring failed
+    # calls surface promptly.
+    _CALL_TIMEOUT_SECONDS = 90
+
     def generate(self, system_blocks, user_prompt, config):
-        msg = self._sync.messages.create(
+        msg = self._sync.with_options(
+            timeout=self._CALL_TIMEOUT_SECONDS,
+        ).messages.create(
             model=config.model,
             max_tokens=config.max_tokens,
+            temperature=config.temperature,
             system=system_blocks,
             messages=[{"role": "user", "content": user_prompt}],
         )
         return self._build_result(msg)
 
     async def generate_async(self, system_blocks, user_prompt, config):
-        msg = await self._async.messages.create(
+        msg = await self._async.with_options(
+            timeout=self._CALL_TIMEOUT_SECONDS,
+        ).messages.create(
             model=config.model,
             max_tokens=config.max_tokens,
+            temperature=config.temperature,
             system=system_blocks,
             messages=[{"role": "user", "content": user_prompt}],
         )
