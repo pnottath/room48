@@ -519,16 +519,37 @@ def generate_narrative_pdf(req: NarrativePdfRequest):
             detail=f"PDF rendering failed: {e}",
         )
 
-    # Build a friendly download filename:  Room48-Reading-<Name>-<YYYYMMDD>.pdf
-    safe_name = "".join(ch if ch.isalnum() else "" for ch in req.native_name) or "Reading"
-    stamp = datetime.now().strftime("%Y%m%d")
-    filename = f"Room48-Reading-{safe_name}-{stamp}.pdf"
+    # Build a friendly download filename:
+    #   "Prasanth Nottath Room48 Jaathakam.pdf"
+    # Spaces preserved, punctuation stripped, multiple spaces collapsed.
+    # Falls back to "Reading" if the name field is empty.
+    import re as _re
+    from urllib.parse import quote as _urlquote
+    cleaned = _re.sub(r"[^\w\s]", "", req.native_name, flags=_re.UNICODE)
+    cleaned = _re.sub(r"\s+", " ", cleaned).strip()
+    safe_name = cleaned or "Reading"
+    filename = f"{safe_name} Room48 Jaathakam.pdf"
+
+    # HTTP header values are ASCII. To support non-ASCII names (e.g.
+    # Malayalam script in the future) we emit both forms per RFC 5987:
+    #   - `filename="..."` with non-ASCII chars stripped, for older clients
+    #   - `filename*=UTF-8''...` with the full name, for compliant clients
+    ascii_stripped = filename.encode("ascii", "ignore").decode("ascii")
+    # Re-collapse whitespace in case the name was entirely non-ASCII
+    # (e.g. "പ്രശാന്ത്" would strip to "" and leave stray spaces).
+    ascii_stripped = _re.sub(r"\s+", " ", ascii_stripped).strip()
+    ascii_filename = ascii_stripped or "Reading Room48 Jaathakam.pdf"
+    utf8_encoded = _urlquote(filename, safe="")
+    content_disposition = (
+        f'attachment; filename="{ascii_filename}"; '
+        f"filename*=UTF-8''{utf8_encoded}"
+    )
 
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
         headers={
-            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Disposition": content_disposition,
             "Cache-Control": "no-store",
         },
     )
