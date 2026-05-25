@@ -197,7 +197,7 @@ class NarrativeRequest(BirthDataRequest):
         description=("Which sections to generate. If omitted, all sections "
                      "are produced. Valid: " + ", ".join(VALID_SECTIONS)))
     model: str = Field(
-        "claude-opus-4-7",
+        "claude-sonnet-4-6",
         description="LLM model name passed to the provider.")
     temperature: float = Field(0.55, ge=0.0, le=1.0)
     include_digest_in_response: bool = Field(
