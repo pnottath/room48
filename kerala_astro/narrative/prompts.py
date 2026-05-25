@@ -113,6 +113,33 @@ def system_blocks(language: str, digest: str) -> list[dict]:
 # persona and the digest; the user message just says "render section X".
 
 BRIEFS = {
+    "summary": """Write a plain-English executive summary of this chart (around 280-320 words total) for a reader who knows nothing about astrology. Structure it as exactly five short paragraphs, each opening with a bolded sub-heading:
+
+  **Who you are at a glance** (2-3 sentences)
+      A character sketch of the native's natural temperament, drawn from the lagna, Moon, and Sun placements in the digest. Do not use any astrological terms — translate them into ordinary personality language.
+
+  **Your natural strengths** (3-4 sentences)
+      The two or three most prominent yogas from the digest, reframed as life traits the person actually experiences. E.g. Sasa Yoga becomes "a deep capacity for patience and the kind of inner steadiness that carries you through long stretches of hard work." Name the yoga concept by what it FEELS like to live with, not by its Sanskrit name.
+
+  **What this season of your life is about** (3-4 sentences)
+      The current Mahadasa-Antardasa, translated into life themes — career, family, learning, money, health — based ONLY on what the digest says about that dasa lord's placement and meanings. Avoid the words "dasa", "antardasa", "lord", "house". Include the month-year when this period ends, framed as a transition rather than a deadline (e.g. "this season runs until late 2027, after which the focus shifts toward...").
+
+  **What's ahead** (3-4 sentences)
+      The next 1-2 upcoming mahadasas in plain themes, with their approximate year ranges (e.g. "from late 2027 through 2037" or "the seven years after that, roughly 2037 to 2044"). No technical vocabulary. Frame as tendencies that unfold over years, not as fixed events or deadlines.
+
+  **One thing to watch for** (2-3 sentences)
+      One honest, kindly-framed caution drawn from a dosha or weakness in the digest. Never alarmist, never deterministic. If there is a Kuja Dosha, frame it as something like "relationships in this chart can have an early-life friction that softens with patience" rather than naming the dosha.
+
+CRITICAL RULES:
+- No untranslated Sanskrit terms anywhere. No "lagna", "rasi", "nakshatra", "dasa", "yoga", "bhava", "graha", "dosha", etc.
+- No house numbers or planet names except in their everyday English forms (Sun, Moon, Mars are fine — "Mangal", "Surya", "Chandra" are not).
+- No degrees, padas, or technical positions.
+- Specific to THIS chart, not generic. Every sentence should be something that could not equally apply to any other person.
+- Warm but honest. Not horoscope-column fluff. Not doom-laden.
+- End with one short sentence acknowledging the depth below: "The full reading that follows has the detail behind each of these threads."
+
+CRITICAL: Begin directly with the first bold sub-heading. Do NOT write any overall heading, title, or preamble like "**At a glance**" or "**Summary**" — the section title will be added separately.""",
+
     "overview": """Write a brief opening to the janma kundali reading (around 150-200 words). Address the native warmly by name once, identify the lagnam, janma rasi, and janma nakshatram (with ganam and nadi), and indicate the lagna lord's placement at a high level. Set the tone for the rest of the reading. Do NOT list every planet.
 
 CRITICAL: Begin directly with the prose. Do NOT write any heading, title, section name, or bold opener like "Opening" or "**Opening**" — the section title will be added separately.""",
@@ -165,6 +192,7 @@ CRITICAL: Begin directly with the prose. Do NOT write any heading, title, sectio
 
 
 SECTION_HEADERS = {
+    "summary":       "At a glance",
     "overview":      "Opening",
     "personality":   "Vyakti Swabhavam — Personality",
     "bhava":         "Bhava Phalam — House Analysis",
