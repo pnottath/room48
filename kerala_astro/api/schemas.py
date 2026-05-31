@@ -273,3 +273,75 @@ class NarrativePdfRequest(BaseModel):
     # Optional — the cover shows when the reading was generated. If
     # omitted, the server uses 'now'.
     generated_on: Optional[str] = Field(None, description="Optional pre-formatted date, e.g. '24 May 2026'.")
+
+
+# ────────────────────────────────────────────────────────────────────
+# Ask a question (Q&A flow)
+# ────────────────────────────────────────────────────────────────────
+
+class AskRequest(BirthDataRequest):
+    """
+    Request for /api/v1/ask — chart-grounded Q&A.
+
+    The user submits birth details and a single question. The backend
+    computes the chart (deterministic, no LLM) and builds the digest,
+    then sends ONE constrained LLM call. The answer is grounded only
+    in the digest's facts; out-of-scope or unverifiable questions get
+    a clean refusal.
+    """
+    question: str = Field(
+        ...,
+        min_length=4,
+        max_length=500,
+        description="The user's question about their chart.",
+    )
+    language: str = Field(
+        "english",
+        description="english | manglish | malayalam | malayalam_script",
+    )
+    model: str = Field(
+        "claude-sonnet-4-6",
+        description="Anthropic model to use.",
+    )
+
+    @field_validator("language")
+    @classmethod
+    def _valid_lang(cls, v: str) -> str:
+        if v not in VALID_LANGUAGES:
+            raise ValueError(f"language must be one of {VALID_LANGUAGES}")
+        return v
+
+    @field_validator("question")
+    @classmethod
+    def _clean_question(cls, v: str) -> str:
+        v = v.strip()
+        if len(v) < 4:
+            raise ValueError("question is too short")
+        return v
+
+
+class AskGrounding(BaseModel):
+    """One piece of chart-fact grounding used by the answer."""
+    fact: str = Field(..., description="A specific fact from the digest the answer relies on.")
+
+
+class AskResponse(BaseModel):
+    """Response from /api/v1/ask."""
+    question: str = Field(..., description="The original question, echoed back.")
+    answer: str = Field(..., description="The grounded answer in flowing prose.")
+    grounded_in: List[AskGrounding] = Field(
+        default_factory=list,
+        description="Chart facts the answer drew on, for transparency.",
+    )
+    classification: str = Field(
+        ...,
+        description="answerable | interpretive | out_of_scope | refused",
+    )
+    language: str
+    model: str
+    provider: str
+    disclaimer: str
+    usage: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Token usage telemetry for this call.",
+    )
