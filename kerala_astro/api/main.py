@@ -83,6 +83,7 @@ from .schemas import (
     DashaResponse, HealthResponse, ErrorResponse,
     NarrativeRequest, NarrativeResponse, NarrativeSectionResponse,
     NarrativePdfRequest,
+    AskRequest, AskResponse, AskGrounding,
 )
 from .converters import (
     chart_to_response, yoga_to_response, dasha_to_response,
@@ -556,5 +557,74 @@ def generate_narrative_pdf(req: NarrativePdfRequest):
         headers={
             "Content-Disposition": content_disposition,
             "Cache-Control": "no-store",
+        },
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Grounded Q&A — single-question, single-call, strict refusal discipline
+# ─────────────────────────────────────────────────────────────────────────
+
+@app.post("/api/v1/ask",
+          tags=["narrative"],
+          summary="Ask a single grounded question about a chart",
+          responses={
+              200: {"description": "A grounded answer with citations to the chart digest."},
+              422: {"model": ErrorResponse},
+              503: {"model": ErrorResponse},
+          })
+def ask_question(req: AskRequest):
+    """
+    Chart-grounded Q&A. Takes birth details + a single question,
+    computes the chart deterministically, and returns ONE LLM
+    answer constrained to facts in the digest. Out-of-scope or
+    sensitive questions get a clean refusal.
+
+    Cost per question: ~$0.02-$0.04 on Sonnet 4.6.
+    """
+    # Deferred imports
+    from ..narrative.ask_engine import AskEngine, AskOptions
+
+    # Compute chart deterministically (no LLM, no network)
+    birth = _to_birthdata(req)
+    chart = _safe_compute(birth)
+    dashas = compute_vimshottari(chart, include_pratyantar=False)
+    yogas = detect_all_yogas(chart)
+
+    try:
+        engine = AskEngine()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"LLM provider unavailable: {e}",
+        )
+
+    options = AskOptions(
+        language=req.language,
+        model=req.model,
+    )
+
+    try:
+        result = engine.answer(chart, yogas, dashas, req.question, options)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Q&A generation failed: {e}",
+        )
+
+    return AskResponse(
+        question=result.question,
+        answer=result.answer,
+        grounded_in=[AskGrounding(fact=g.fact) for g in result.grounded_in],
+        classification=result.classification,
+        language=result.language,
+        model=result.model,
+        provider=result.provider_name,
+        disclaimer=DISCLAIMER,
+        usage={
+            "input_tokens": result.usage.input_tokens,
+            "output_tokens": result.usage.output_tokens,
+            "cache_read_tokens": result.usage.cache_read_tokens,
+            "cache_creation_tokens": result.usage.cache_creation_tokens,
         },
     )
